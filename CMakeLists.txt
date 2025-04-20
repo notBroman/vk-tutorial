@@ -4,9 +4,9 @@ project(VK_tutorial)
 include(FetchContent)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(Vulkan REQUIRED)
-find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3)
 find_package(glm REQUIRED)
 find_package(glfw3 3.4 REQUIRED)
 
@@ -18,11 +18,9 @@ FetchContent_MakeAvailable(tinyobjloader)
 
 add_subdirectory(shaders)
 
-add_executable(VK_tutorial main.cpp
-)
+add_executable(VK_tutorial main.cpp)
 
 target_link_libraries(VK_tutorial Vulkan::Vulkan)
-target_link_libraries(VK_tutorial SDL3::SDL3)
 target_link_libraries(VK_tutorial glm::glm)
 target_link_libraries(VK_tutorial tinyobjloader)
 target_link_libraries(VK_tutorial glfw)
