@@ -1,6 +1,6 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
-#include <vulkan/vulkan.h>
+#include <ggml-vulkan.h>
 
 #include <cstdlib>
 #include <iostream>
@@ -49,8 +49,19 @@ private:
     createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     createInfo.pApplicationInfo = &appInfo;
 
+    // Checking Extension Support
     uint32_t glfwExtensionCount = 0;
+    vkEnumerateInstanceExtensionProperties(nullptr, &glfwExtensionCount, nullptr);
+    std::vector<VkExtensionProperties> extensions(glfwExtensionCount);
+    vkEnumerateInstanceExtensionProperties(nullptr, &glfwExtensionCount, extensions.data());
+
+    std::cout << "available extensions" << std::endl;
+    for(const auto& ext : extensions){
+      std::cout << '\t' <<ext.extensionName << std::endl;
+    }
+
     const char** glfwExtensions;
+
 
     glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
@@ -60,10 +71,10 @@ private:
       requiredExtensions.emplace_back(glfwExtensions[i]);
     }
 
-    requiredExtensions.emplace_back(VK_KHR_PORTABILITY_ENUMERATE_EXTENTION_NAME);
+    requiredExtensions.emplace_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
     createInfo.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
     
-    createInfo.enabledExtensionCount = requiredExtensions.size();
+    createInfo.enabledExtensionCount = static_cast<uint32_t>(requiredExtensions.size());
     createInfo.ppEnabledExtensionNames = requiredExtensions.data();
     createInfo.enabledLayerCount = 0;
 
@@ -82,6 +93,8 @@ private:
   }
 
   void cleanup() {
+    vkDestroyInstance(instance, nullptr);
+
     glfwDestroyWindow(window);
 
     glfwTerminate();
