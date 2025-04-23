@@ -1,6 +1,6 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
-#include <ggml-vulkan.h>
+#include <vulkan/vulkan.h>
 
 #include <cstdlib>
 #include <iostream>
@@ -10,6 +10,17 @@ class HelloTriangleApplication {
 private:
   const uint32_t WIDTH = 800;
   const uint32_t HEIGHT = 600;
+
+  std::vector<const char*> validationLayers = {
+    "VK_LAYER_KHRONOS_validation"
+  };
+
+  #ifdef NDEBUG
+    const bool enableValidationLayers = false;
+  #else
+    const bool enableValidationLayers = true;
+  #endif
+
   GLFWwindow *window;
 
   VkInstance instance;
@@ -37,6 +48,11 @@ private:
   }
   
   void createInstance(){
+    
+    if(enableValidationLayers && !checkValidationSupport()) {
+      throw std::runtime_error("Validation layers requested, but not available!");
+    }
+
     VkApplicationInfo appInfo{};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     appInfo.pApplicationName = "Hello Triangle";
@@ -83,6 +99,31 @@ private:
       throw std::runtime_error("failed to create VkInstance");
     }
 
+  }
+
+  bool checkValidationSupport() {
+    // check if the validationLayers are supported
+    uint32_t layerCount;
+    vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+
+    std::vector<VkLayerProperties> availableLayers(layerCount);
+    vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+
+    for(const char* layerName : validationLayers) {
+      bool layerFound = false;
+
+      for(const auto& LayerProperties : availableLayers) {
+        if (std::strcmp(layerName, LayerProperties.layerName) == 0) {
+          layerFound = true;
+          break;
+        }
+      }
+
+      if(!layerFound){
+        return false;
+      }
+    }
+    return true;
   }
 
   void mainLoop() {
