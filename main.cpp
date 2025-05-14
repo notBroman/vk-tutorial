@@ -265,7 +265,22 @@ private:
   bool isDeviceSuitable(VkPhysicalDevice device){
     QueueFamilyIndices indices = findQueueFamilies(device);
 
-    return indices.isComplete();
+    if(indices.isComplete()){ 
+      // Checking Extension Support
+      uint32_t extensionCount = 0;
+      vkEnumerateDeviceExtensionProperties(device, nullptr,  &extensionCount, nullptr);
+      std::vector<VkExtensionProperties> extensionsList(extensionCount);
+      vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, extensionsList.data());
+
+      std::cout << "available device extensions" << std::endl;
+      for(const auto& ext : extensionsList){
+        std::cout << '\t' << ext.extensionName << std::endl;
+        if( strcmp(ext.extensionName, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) == 0){
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device){
@@ -310,7 +325,15 @@ private:
     createInfo.queueCreateInfoCount = 1;
 
     createInfo.pEnabledFeatures = &deviceFeatures;
-    createInfo.enabledExtensionCount = 0;
+
+    std::vector<const char*> requiredExtensions = {};
+
+    requiredExtensions.emplace_back(VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME);
+    createInfo.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+
+    createInfo.enabledExtensionCount = static_cast<uint32_t>(requiredExtensions.size());
+    createInfo.ppEnabledExtensionNames = requiredExtensions.data();
+
 
     if(enableValidationLayers){
       createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
