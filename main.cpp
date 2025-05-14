@@ -326,7 +326,7 @@ private:
     createInfo.pQueueCreateInfos = &queueCreateInfo;
     createInfo.queueCreateInfoCount = 1;
 
-    createInfo.pEnabledFeatures = &deviceFeatures;
+    // createInfo.pEnabledFeatures = &deviceFeatures;
 
     std::vector<const char*> requiredExtensions = {};
 
@@ -342,6 +342,18 @@ private:
     } else {
       createInfo.enabledLayerCount = 0;
     }
+
+    VkPhysicalDeviceFeatures2 deviceFeatures2{};
+    deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR;
+    deviceFeatures2.features = deviceFeatures;
+    
+
+    VkPhysicalDevicePortabilitySubsetFeaturesKHR portabilitySubsetFeaturesKHR{};
+    // todo:
+    //  find missing include
+    portabilitySubsetFeaturesKHR.sType = static_cast<VkStructureType>(1000163000);
+    deviceFeatures2.pNext = &portabilitySubsetFeaturesKHR;
+
 
     if(vkCreateDevice(physicalDevice, &createInfo, nullptr, &device) != VK_SUCCESS){
       throw std::runtime_error("Failed to create logical device!");
