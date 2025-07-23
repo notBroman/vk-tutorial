@@ -1054,9 +1054,9 @@ private:
     fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
     for(size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++){
-      if ( vkCreateSemaphore(device, &semaphoreInfo, nullptr, &imageAvailableSemaphores[currentFrame]) != VK_SUCCESS 
-          || vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphores[currentFrame]) != VK_SUCCESS 
-          || vkCreateFence(device, &fenceInfo, nullptr, &inFlightFences[currentFrame]) != VK_SUCCESS
+      if ( vkCreateSemaphore(device, &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS 
+          || vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS 
+          || vkCreateFence(device, &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS
           ) {
         throw std::runtime_error("Failed to create Semaphores!");
       }
