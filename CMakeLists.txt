@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.28)
 project(VK_tutorial)
+set(CMAKE_BUILD_TYPE Debug)
 
 include(FetchContent)
 
