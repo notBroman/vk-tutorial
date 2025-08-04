@@ -16,7 +16,15 @@ FetchContent_Declare(tinyobjloader
         GIT_REPOSITORY "https://github.com/tinyobjloader/tinyobjloader"
         GIT_TAG "v2.0.0rc13"
 )
-FetchContent_MakeAvailable(tinyobjloader)
+
+FetchContent_Declare(stb
+        GIT_REPOSITORY "https://github.com/nothings/stb"
+        GIT_TAG "f58f558c120e9b32c217290b80bad1a0729fbb2c"
+        FIND_PACKAGE_ARGS
+)
+FetchContent_MakeAvailable(tinyobjloader stb)
+FetchContent_GetProperties(stb)
+
 
 add_subdirectory(shaders)
 
@@ -25,6 +33,7 @@ add_executable(VK_tutorial main.cpp)
 target_link_libraries(VK_tutorial Vulkan::Vulkan)
 target_link_libraries(VK_tutorial glm::glm)
 target_link_libraries(VK_tutorial tinyobjloader)
+target_include_directories(VK_tutorial PRIVATE ${stb_SOURCE_DIR})
 target_link_libraries(VK_tutorial glfw)
 
 add_dependencies(VK_tutorial shaders)
